@@ -21,7 +21,7 @@ const HomePage = () => {
       .delete()
       .eq("id", userId);
 
-    fetchUsers();
+    fetchUser();
 
     if (error) {
       console.log(error);
@@ -61,7 +61,15 @@ const HomePage = () => {
             {users.map((user) => (
               <tr key={user.id}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm border border-black">
-                  {user.id}
+                  {user.avatar_url ? (
+                    <img
+                      src={user.avatar_url}
+                      alt={`${user.name}'s avatar`}
+                      width={100}
+                    />
+                  ) : (
+                    <p>No avatar availble</p>
+                  )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm border border-black">
                   {user.name}

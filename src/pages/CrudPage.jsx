@@ -9,17 +9,20 @@ const CrudPage = () => {
   const [user, setUser] = useState({
     name: "",
     age: "",
+    avatar_url: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [file, setFile] = useState(null);
 
   useEffect(() => {
     const fetchUser = async () => {
       if (id) {
         setLoading(true);
+        setError(null);
         const { data, error } = await supabase
           .from("users")
-          .select("id, name, age")
+          .select("id, name, age, avatar_url")
           .eq("id", id)
           .single();
 
@@ -44,38 +47,99 @@ const CrudPage = () => {
     }));
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith("image/")) {
+      setFile(file);
+    } else {
+      setError("kesalahan tipe file, tolong masukan file gambar saja");
+    }
+  };
+
+  const uploadImage = async () => {
+    if (!file) {
+      setError("Tolong Masukan file untuk di upload");
+      return;
+    }
+
+    try {
+      // Upload file ke supabase
+
+      const { data, error: uploadError } = await supabase.storage
+        .from("avatars")
+        .upload(`public/${file.name}`, file);
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      // Mendapatkan Url dari file yang di unggah
+
+      const { data: urlData, error: urlError } = supabase.storage
+        .from("avatars")
+        .getPublicUrl(`public/${file.name}`);
+
+      if (urlError) {
+        throw urlError;
+      }
+
+      return urlData.publicUrl;
+      // setPublicUrl(urlData.publicUrl);
+    } catch (error) {
+      console.error("error mengupload error:", error.message);
+      setError("Error uploading file: " + error.message);
+      return null;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (id) {
-      // update User
-      const { error } = await supabase
-        .from("users")
-        .update({ name: user.name, age: user.age })
-        .eq("id", id);
+    // Periksa file ada file yang dipilih
+    let imageUrl = user.avatar_url;
 
-      if (error) {
-        setError("Failed to update user");
-        console.error(error);
-      } else {
-        navigate("/");
+    if (file) {
+      imageUrl = await uploadImage();
+
+      if (!imageUrl) {
+        console.log(user);
+        console.log(imageUrl);
+        setError("Failed to upload image");
+        return;
       }
-    } else {
-      // Create User
-      const { error } = await supabase
-        .from("users")
-        .insert({ name: user.name, age: user.age });
 
-      if (error) {
-        setError("Failed to create user");
-        console.error(error);
+      if (id) {
+        // Update User
+        console.log(imageUrl);
+        const { error } = await supabase
+          .from("users")
+          .update({ name: user.name, age: user.age, avatar_url: imageUrl })
+          .eq("id", id);
+        if (error) {
+          setError("Gagal memperbarui data");
+          console.error(error);
+        } else {
+          console.log(user);
+          navigate("/");
+        }
       } else {
-        navigate("/");
+        // Create User
+        const { error } = await supabase
+          .from("users")
+          .insert({ name: user.name, age: user.age, avatar_url: imageUrl });
+
+        if (error) {
+          setError("Gagal menambahkan data");
+          console.error(error);
+        } else {
+          console.log(user);
+          navigate("/");
+        }
       }
     }
   };
 
   if (loading) return <p>Loading....</p>;
-  if (error) return <p>Error: {erorr}</p>;
+  if (error) return <p>Error: {error}</p>;
 
   return (
     <>
@@ -87,7 +151,7 @@ const CrudPage = () => {
           <form action="" onSubmit={handleSubmit}>
             <div className="mb-4">
               <label
-                htmlFor=""
+                htmlFor="name"
                 className="block text-gray-700 font-medium mb-2"
               >
                 Nama:{" "}
@@ -102,18 +166,33 @@ const CrudPage = () => {
             </div>
             <div className="mb-4">
               <label
-                htmlFor=""
+                htmlFor="age"
                 className="block text-gray-700 font-medium mb-2"
               >
                 Age:{" "}
               </label>
               <input
-                type="text"
+                type="number"
                 value={user.age}
                 name="age"
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
+            </div>
+            <div className="mb-4">
+              <label
+                htmlFor="avatar"
+                className="block text-gray-700 font-medium mb-2"
+              >
+                Avatar:
+              </label>
+              <input type="file" onChange={handleFileChange} name="avatar" />
+              {user.avatar_url && (
+                <div className="">
+                  <p>Current Avatar</p>
+                  <img src={user.avatar_url} alt="Avatar" />
+                </div>
+              )}
             </div>
             <button
               type="submit"

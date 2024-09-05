@@ -26,6 +26,9 @@ const Navbar = () => {
                 <NavLink to={"/crud"} className={linkClass}>
                   Crud
                 </NavLink>
+                <NavLink to={"/auth"} className={linkClass}>
+                  Login
+                </NavLink>
               </div>
             </div>
           </div>
