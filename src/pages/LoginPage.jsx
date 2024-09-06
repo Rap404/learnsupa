@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../createClient";
-import { Link } from "react-router-dom";
-const SignUpPage = () => {
+
+const LoginPage = ({ setToken }) => {
   const [formData, setFormData] = useState({
-    fullname: "",
     email: "",
     password: "",
   });
+  let navigate = useNavigate();
 
   console.log(formData);
   function handleChange(event) {
@@ -21,39 +23,23 @@ const SignUpPage = () => {
   async function handleSubmit(e) {
     e.preventDefault();
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password,
-        options: {
-          data: {
-            full_name: formData.fullname,
-          },
-        },
       });
       if (error) throw error;
-      alert("check your email for verification link");
+      console.log(data);
+      setToken(data);
+      navigate("/home");
     } catch (error) {
       alert(error);
     }
   }
-
   return (
     <div className="bg-gray-100 flex items-center justify-center h-screen">
       <div className="bg-white p-8 rounded shadow-md w-80">
-        <h2 className="text-2xl font-bold mb-6 text-center">Form Sign In</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">Form Login</h2>
         <form action="" onSubmit={handleSubmit}>
-          <label
-            htmlFor="fullname"
-            className="block text-gray-700 font-medium mb-2"
-          >
-            Fullname:{" "}
-          </label>
-          <input
-            placeholder="Fullname"
-            name="fullname"
-            onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
           <label
             htmlFor="email"
             className="block text-gray-700 font-medium mb-2"
@@ -86,10 +72,10 @@ const SignUpPage = () => {
             submit
           </button>
         </form>
-        Already have an account?<Link to="/">Login</Link>
+        Don't have an account?<Link to="/signin">Sign in</Link>
       </div>
     </div>
   );
 };
 
-export default SignUpPage;
+export default LoginPage;

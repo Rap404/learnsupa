@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../createClient";
 import { useNavigate } from "react-router-dom";
 
-const HomePage = () => {
+const HomePage = ({ token }) => {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
@@ -37,8 +37,16 @@ const HomePage = () => {
     navigate(`/crud/${userId}`);
   };
 
+  function handleLogout() {
+    sessionStorage.removeItem("token");
+    navigate("/");
+  }
   return (
     <div className="px-10 py-10">
+      <h2>Welcome, {token.user.user_metadata.full_name}</h2>
+      <button className="px-4 mx-3 bg-red-400" onClick={handleLogout}>
+        Logout
+      </button>
       <div className="overflow-x-auto ">
         <table className="min-w-full border border-gray-200 divide-y divide-gray-200 bg-slate-500">
           <thead className="bg-gray-50">

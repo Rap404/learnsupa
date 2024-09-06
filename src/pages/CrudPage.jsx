@@ -47,6 +47,7 @@ const CrudPage = () => {
     }));
   };
 
+  console.log(user);
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file && file.type.startsWith("image/")) {
@@ -106,34 +107,33 @@ const CrudPage = () => {
         setError("Failed to upload image");
         return;
       }
+    }
 
-      if (id) {
-        // Update User
-        console.log(imageUrl);
-        const { error } = await supabase
-          .from("users")
-          .update({ name: user.name, age: user.age, avatar_url: imageUrl })
-          .eq("id", id);
-        if (error) {
-          setError("Gagal memperbarui data");
-          console.error(error);
-        } else {
-          console.log(user);
-          navigate("/");
-        }
+    if (id) {
+      // Update User
+      const { error } = await supabase
+        .from("users")
+        .update({ name: user.name, age: user.age, avatar_url: imageUrl })
+        .eq("id", id);
+      if (error) {
+        setError("Gagal memperbarui data");
+        console.error(error);
       } else {
-        // Create User
-        const { error } = await supabase
-          .from("users")
-          .insert({ name: user.name, age: user.age, avatar_url: imageUrl });
+        console.log(user);
+        navigate("/");
+      }
+    } else {
+      // Create User
+      const { error } = await supabase
+        .from("users")
+        .insert({ name: user.name, age: user.age, avatar_url: imageUrl });
 
-        if (error) {
-          setError("Gagal menambahkan data");
-          console.error(error);
-        } else {
-          console.log(user);
-          navigate("/");
-        }
+      if (error) {
+        setError("Gagal menambahkan data");
+        console.error(error);
+      } else {
+        console.log(user);
+        navigate("/");
       }
     }
   };
