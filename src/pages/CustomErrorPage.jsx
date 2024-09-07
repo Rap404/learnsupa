@@ -3,13 +3,13 @@ import { useRouteError } from "react-router-dom";
 
 const CustomErrorPage = () => {
   const error = useRouteError();
-  // console.error(error);
+  console.error({ error });
   return (
     <div>
       <h1>Oops!</h1>
       <p>sorry, an unecpected error has occured.</p>
       <p>
-        <i>{error?.statusText || error?.message || "Unknown error"}</i>
+        <i>{error?.statusText || error?.message || "Page Gaada Brohh!!!"}</i>
       </p>
     </div>
   );

@@ -2,6 +2,7 @@ import React from "react";
 import { useEffect, useState } from "react";
 import { supabase } from "../createClient";
 import { useNavigate } from "react-router-dom";
+import SearchBar from "../components/SearchBar";
 
 const HomePage = ({ token }) => {
   const [users, setUsers] = useState([]);
@@ -43,11 +44,16 @@ const HomePage = ({ token }) => {
   }
   return (
     <div className="px-10 py-10">
-      <h2>Welcome, {token.user.user_metadata.full_name}</h2>
-      <button className="px-4 mx-3 bg-red-400" onClick={handleLogout}>
-        Logout
-      </button>
-      <div className="overflow-x-auto ">
+      <div className="flex">
+        <div className="">
+          <h2>Welcome, {token.user.user_metadata.full_name}</h2>
+          <button className="px-4 mx-3 bg-red-400 mt-1" onClick={handleLogout}>
+            Logout
+          </button>
+        </div>
+        <SearchBar />
+      </div>
+      <div className="overflow-x-auto mt-3">
         <table className="min-w-full border border-gray-200 divide-y divide-gray-200 bg-slate-500">
           <thead className="bg-gray-50">
             <tr className=" border border-black bg-slate-500">

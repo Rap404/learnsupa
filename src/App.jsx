@@ -15,6 +15,7 @@ import CustomErrorPage from "./pages/CustomErrorPage";
 
 function App() {
   const [token, setToken] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   if (token) {
     sessionStorage.setItem("token", JSON.stringify(token));
@@ -25,7 +26,11 @@ function App() {
       let data = JSON.parse(sessionStorage.getItem("token"));
       setToken(data);
     }
+    setLoading(false);
   }, []);
+  console.log({ token });
+
+  if (loading) return <>loading...</>;
 
   const router = createBrowserRouter(
     createRoutesFromElements(
