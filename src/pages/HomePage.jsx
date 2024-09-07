@@ -16,6 +16,13 @@ const HomePage = ({ token }) => {
     setUsers(data);
   }
 
+  // async function deleteUser(userId, avatar){
+  //   if (avatar){
+  //     // Ekstrak nama file dari URL avatar
+  //     const fileName = avatar.split("/").pop();
+  //   }
+  // }
+
   async function deleteUser(userId) {
     const { data, error } = await supabase
       .from("users")

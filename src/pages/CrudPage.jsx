@@ -64,11 +64,15 @@ const CrudPage = () => {
     }
 
     try {
+      const timestamp = Date.now();
+      const fileExtension = file.name.split(".").pop();
+      const newFileName = `avatar_${timestamp}.${fileExtension}`;
+
       // Upload file ke supabase
 
       const { data, error: uploadError } = await supabase.storage
         .from("avatars")
-        .upload(`public/${file.name}`, file);
+        .upload(`public/${newFileName}`, file);
 
       if (uploadError) {
         throw uploadError;
@@ -78,7 +82,7 @@ const CrudPage = () => {
 
       const { data: urlData, error: urlError } = supabase.storage
         .from("avatars")
-        .getPublicUrl(`public/${file.name}`);
+        .getPublicUrl(`public/${newFileName}`);
 
       if (urlError) {
         throw urlError;
