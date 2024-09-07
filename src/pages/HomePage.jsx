@@ -16,26 +16,31 @@ const HomePage = ({ token }) => {
     setUsers(data);
   }
 
-  // async function deleteUser(userId, avatar){
-  //   if (avatar){
-  //     // Ekstrak nama file dari URL avatar
-  //     const fileName = avatar.split("/").pop();
-  //   }
-  // }
-
-  async function deleteUser(userId) {
-    const { data, error } = await supabase
+  async function deleteUser(userId, avatar) {
+    if (avatar) {
+      // Ekstrak nama file dari URL avatar
+      const fileName = avatar.split("/").pop();
+      const { error: deleteError } = await supabase.storage
+        .from("avatars")
+        .remove([`public/${fileName}`]);
+      if (deleteError) {
+        console.error("Error deleting file:", deleteError);
+        setError("Gagal menghapus file avatar");
+        return;
+      }
+      console.log("Avatar deleted successfully!");
+    }
+    // Hapus data pengguna dari table
+    const { error: deleteUserError } = await supabase
       .from("users")
       .delete()
       .eq("id", userId);
-
-    fetchUser();
-
-    if (error) {
-      console.log(error);
-    }
-    if (data) {
-      console.log(data);
+    if (deleteUserError) {
+      console.error("Error deleting user:", deleteUserError);
+      setError("Gagal menghapus pengguna");
+    } else {
+      console.log("User deleted succesfully!");
+      navigate("/home");
     }
   }
 
@@ -102,7 +107,7 @@ const HomePage = ({ token }) => {
                   <button
                     className="px-4 mx-3 bg-red-400"
                     onClick={() => {
-                      deleteUser(user.id);
+                      deleteUser(user.id, user.avatar_url);
                     }}
                   >
                     Delete

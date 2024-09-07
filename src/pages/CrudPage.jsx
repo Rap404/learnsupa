@@ -137,7 +137,7 @@ const CrudPage = () => {
         console.error(error);
       } else {
         console.log(user);
-        navigate("/");
+        navigate("/home");
       }
     }
   };
