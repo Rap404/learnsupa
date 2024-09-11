@@ -2,6 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../createClient";
+import ImageUpload from "../components/ImageUpload";
 
 const LoginPage = ({ setToken }) => {
   const [formData, setFormData] = useState({
@@ -37,6 +38,7 @@ const LoginPage = ({ setToken }) => {
   }
   return (
     <div className="bg-gray-100 flex items-center justify-center h-screen">
+      <ImageUpload />
       <div className="bg-white p-8 rounded shadow-md w-80">
         <h2 className="text-2xl font-bold mb-6 text-center">Form Login</h2>
         <form action="" onSubmit={handleSubmit}>
