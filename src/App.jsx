@@ -37,11 +37,12 @@ function App() {
       <Route path="/" element={<MainLayout />}>
         <Route index element={<LoginPage setToken={setToken} />} />
         <Route path="/signin" element={<SignUpPage />} />
-        {token ? (
+        <Route path="/home" element={<HomePage />} />
+        {/* {token ? (
           <Route path="/home" element={<HomePage token={token} />} />
         ) : (
           ""
-        )}
+        )} */}
         <Route path="/crud" element={<CrudPage />} />
         <Route path="/crud/:id" element={<CrudPage />} />
         <Route path="*" element={<CustomErrorPage />} />
