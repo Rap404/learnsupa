@@ -6,10 +6,10 @@ import { useNavigate, useParams } from "react-router-dom";
 const CrudPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [user, setUser] = useState({
+  const [projects, setProjects] = useState({
     name: "",
-    age: "",
-    avatar_url: "",
+    image: "",
+    description: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -21,8 +21,8 @@ const CrudPage = () => {
         setLoading(true);
         setError(null);
         const { data, error } = await supabase
-          .from("users")
-          .select("id, name, age, avatar_url")
+          .from("Projects")
+          .select("id, name, image, description")
           .eq("id", id)
           .single();
 
@@ -30,7 +30,7 @@ const CrudPage = () => {
           setError("Failed to fetch user data");
           console.error(error);
         } else {
-          setUser(data);
+          setProjects(data);
         }
         setLoading(false);
       }
@@ -41,13 +41,13 @@ const CrudPage = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUser((prevUser) => ({
-      ...prevUser,
+    setProjects((prevProjects) => ({
+      ...prevProjects,
       [name]: value,
     }));
   };
 
-  console.log(user);
+  console.log(projects);
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file && file.type.startsWith("image/")) {
@@ -100,13 +100,13 @@ const CrudPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     // Periksa file ada file yang dipilih
-    let imageUrl = user.avatar_url;
+    let imageUrl = projects.image;
 
     if (file) {
       imageUrl = await uploadImage();
 
       if (!imageUrl) {
-        console.log(user);
+        console.log(projects);
         console.log(imageUrl);
         setError("Failed to upload image");
         return;
@@ -114,29 +114,35 @@ const CrudPage = () => {
     }
 
     if (id) {
-      // Update User
+      // Update Projects
       const { error } = await supabase
-        .from("users")
-        .update({ name: user.name, age: user.age, avatar_url: imageUrl })
+        .from("Projects")
+        .update({
+          name: projects.name,
+          image: imageUrl,
+          description: projects.description,
+        })
         .eq("id", id);
       if (error) {
         setError("Gagal memperbarui data");
         console.error(error);
       } else {
-        console.log(user);
-        navigate("/");
+        console.log(projects);
+        navigate("/home");
       }
     } else {
       // Create User
-      const { error } = await supabase
-        .from("users")
-        .insert({ name: user.name, age: user.age, avatar_url: imageUrl });
+      const { error } = await supabase.from("Projects").insert({
+        name: projects.name,
+        image: imageUrl,
+        description: projects.description,
+      });
 
       if (error) {
         setError("Gagal menambahkan data");
         console.error(error);
       } else {
-        console.log(user);
+        console.log(projects);
         navigate("/home");
       }
     }
@@ -150,7 +156,7 @@ const CrudPage = () => {
       <div className="bg-gray-100 flex items-center justify-center h-screen">
         <div className="bg-white p-8 rounded shadow-md w-80">
           <h2 className="text-2xl font-bold mb-6 text-center">
-            Form {id ? "Edit" : "Create"} user
+            Form {id ? "Edit" : "Create"} Project
           </h2>
           <form action="" onSubmit={handleSubmit}>
             <div className="mb-4">
@@ -158,11 +164,11 @@ const CrudPage = () => {
                 htmlFor="name"
                 className="block text-gray-700 font-medium mb-2"
               >
-                Nama:{" "}
+                Name:{" "}
               </label>
               <input
                 type="text"
-                value={user.name}
+                value={projects.name}
                 name="name"
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -170,31 +176,31 @@ const CrudPage = () => {
             </div>
             <div className="mb-4">
               <label
-                htmlFor="age"
+                htmlFor="description"
                 className="block text-gray-700 font-medium mb-2"
               >
-                Age:{" "}
+                Description:{" "}
               </label>
               <input
-                type="number"
-                value={user.age}
-                name="age"
+                type="text"
+                value={projects.description}
+                name="description"
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div className="mb-4">
               <label
-                htmlFor="avatar"
+                htmlFor="image"
                 className="block text-gray-700 font-medium mb-2"
               >
-                Avatar:
+                Image:
               </label>
-              <input type="file" onChange={handleFileChange} name="avatar" />
-              {user.avatar_url && (
+              <input type="file" onChange={handleFileChange} name="image" />
+              {projects.image && (
                 <div className="">
                   <p>Current Avatar</p>
-                  <img src={user.avatar_url} alt="Avatar" />
+                  <img src={projects.image} alt="image" />
                 </div>
               )}
             </div>

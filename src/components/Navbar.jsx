@@ -1,12 +1,33 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Logo from "../assets/raplikeren.png";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
+  const [token, setToken] = useState(null);
+  const navigate = useNavigate();
   const linkClass = ({ isActive }) =>
     isActive
       ? "bg-black text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2"
       : "text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2";
+
+  useEffect(() => {
+    // cek apakah ada token di sessionStorage
+    const storedToken = sessionStorage.getItem("token");
+    if (storedToken) {
+      const userData = JSON.parse(storedToken);
+      setToken(userData);
+    }
+  }, []);
+
+  const handleAvatarClick = () => {
+    if (token) {
+      // Jika sudah login, bisa redirect ke profile atau dashboard
+      navigate("/profile");
+    } else {
+      navigate("/profile");
+    }
+  };
+
   return (
     <nav className="bg-indigo-700 border-b border-indigo-500">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -29,6 +50,15 @@ const Navbar = () => {
                 <NavLink to={"/"} className={linkClass}>
                   Login
                 </NavLink>
+                <div>
+                  <button onClick={handleAvatarClick}>
+                    <img
+                      className="w-10 h-10 rounded-full border-2 border-white"
+                      src={Logo}
+                      alt="User Avatar"
+                    />
+                  </button>
+                </div>
               </div>
             </div>
           </div>

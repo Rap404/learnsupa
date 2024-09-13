@@ -5,18 +5,18 @@ import { useNavigate } from "react-router-dom";
 import SearchBar from "../components/SearchBar";
 
 const HomePage = ({ token }) => {
-  const [users, setUsers] = useState([]);
+  const [projects, setProjets] = useState([]);
 
   useEffect(() => {
     fetchUser();
   }, []);
 
   async function fetchUser() {
-    const { data } = await supabase.from("users").select("*");
-    setUsers(data);
+    const { data } = await supabase.from("Projects").select("*");
+    setProjets(data);
   }
 
-  async function deleteUser(userId, avatar) {
+  async function deleteUser(projectId, avatar) {
     if (avatar) {
       // Ekstrak nama file dari URL avatar
       const fileName = avatar.split("/").pop();
@@ -32,9 +32,9 @@ const HomePage = ({ token }) => {
     }
     // Hapus data pengguna dari table
     const { error: deleteUserError } = await supabase
-      .from("users")
+      .from("Projects")
       .delete()
-      .eq("id", userId);
+      .eq("id", projectId);
     if (deleteUserError) {
       console.error("Error deleting user:", deleteUserError);
       setError("Gagal menghapus pengguna");
@@ -46,22 +46,16 @@ const HomePage = ({ token }) => {
 
   const navigate = useNavigate();
 
-  const navEdit = (userId) => {
-    navigate(`/crud/${userId}`);
+  const navEdit = (projectId) => {
+    navigate(`/crud/${projectId}`);
   };
 
-  function handleLogout() {
-    sessionStorage.removeItem("token");
-    navigate("/");
-  }
   return (
     <div className="px-10 py-10">
       <div className="flex">
         <div className="">
           <h2>Welcome, {token.user.user_metadata.full_name}</h2>
-          <button className="px-4 mx-3 bg-red-400 mt-1" onClick={handleLogout}>
-            Logout
-          </button>
+          <h2>Welcome, {token.user.user_metadata.role}</h2>
         </div>
         <SearchBar />
       </div>
@@ -76,7 +70,7 @@ const HomePage = ({ token }) => {
                 Name
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider border border-black">
-                Age
+                Description
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider border border-black">
                 Actions
@@ -84,13 +78,13 @@ const HomePage = ({ token }) => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {users.map((user) => (
-              <tr key={user.id}>
+            {projects.map((project) => (
+              <tr key={project.id}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm border border-black">
-                  {user.avatar_url ? (
+                  {project.image ? (
                     <img
-                      src={user.avatar_url}
-                      alt={`${user.name}'s avatar`}
+                      src={project.image}
+                      alt={`${project.name}'s avatar`}
                       width={100}
                     />
                   ) : (
@@ -98,23 +92,23 @@ const HomePage = ({ token }) => {
                   )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm border border-black">
-                  {user.name}
+                  {project.name}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm border border-black">
-                  {user.age}
+                  {project.description}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm border border-black">
                   <button
                     className="px-4 mx-3 bg-red-400"
                     onClick={() => {
-                      deleteUser(user.id, user.avatar_url);
+                      deleteUser(project.id, project.image);
                     }}
                   >
                     Delete
                   </button>
                   <button
                     className="px-4 mx-3 bg-blue-400"
-                    onClick={() => navEdit(user.id)}
+                    onClick={() => navEdit(project.id)}
                   >
                     Edit
                   </button>
